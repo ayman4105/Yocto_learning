@@ -595,3 +595,130 @@ file /usr/bin/ayman
        ▼
 10. Booted RPI3 → login root → ran "ayman" → SUCCESS 🎉
 ```
+
+## 13. Task Flags (varflags)
+
+Tasks in bitbake can have **flags** that control their behavior.
+The syntax is: `do_taskname[flag] = "value"`
+
+### 13.1 `[dirs]` - Set working directory before running
+
+```python
+do_compile[dirs] = "${S}"
+```
+
+This tells bitbake to `cd` into `${S}` before executing `do_compile`.
+
+```
+Without [dirs]:
+
+  do_compile() {
+      ${CC} ${S}/src/main.c -o myapp
+      ${CC} ${S}/src/utils.c -o utils.o
+      ${CC} ${S}/src/helper.c -o helper.o
+  }
+
+With [dirs]:
+
+  do_compile[dirs] = "${S}/src"
+
+  do_compile() {
+      ${CC} main.c -o myapp
+      ${CC} utils.c -o utils.o
+      ${CC} helper.c -o helper.o
+  }
+```
+
+> Saves you from writing full paths repeatedly.
+
+### 13.2 `[noexec]` - Skip a task entirely
+
+```python
+do_configure[noexec] = "1"
+```
+
+Tells bitbake to skip this task completely.
+
+```
+Without [noexec]:
+
+  fetch → unpack → patch → configure → compile → install
+                           ──────────
+                           runs empty = wasted time
+
+With [noexec] = "1":
+
+  fetch → unpack → patch → SKIP → compile → install
+                           ────
+                           skipped = faster build
+```
+
+> Useful when recipe has no configure step (e.g., simple .c file with no
+> CMake, Autotools, or Meson).
+
+### 13.3 `[nostamp]` - Always run the task
+
+```python
+do_compile[nostamp] = "1"
+```
+
+Normally bitbake creates a **stamp file** after a task succeeds.
+Next time it sees the stamp, it skips the task.
+`[nostamp]` disables this — the task runs **every time**.
+
+```
+Normal (with stamp):
+
+  $ bitbake hello-ayman
+    do_compile → ran ✅ (stamp created)
+
+  $ bitbake hello-ayman
+    do_compile → SKIPPED (stamp exists)
+
+With [nostamp] = "1":
+
+  $ bitbake hello-ayman
+    do_compile → ran ✅ (no stamp)
+
+  $ bitbake hello-ayman
+    do_compile → ran AGAIN ✅ (always runs)
+```
+
+> Useful for tasks that must run every time regardless of changes.
+
+### 13.4 `[depends]` - Task-level dependency
+
+```python
+do_compile[depends] = "openssl:do_install"
+```
+
+This task will **not start** until the specified task in another recipe finishes.
+
+```
+hello-ayman: do_compile
+    │
+    │  WAITING...
+    │
+    └── openssl: do_install must finish first!
+```
+
+> Useful when your recipe needs a library from another recipe to compile.
+
+### 13.5 `[cleandirs]` - Delete and recreate directory
+
+```python
+do_compile[cleandirs] = "${B}"
+```
+
+Before running the task, bitbake will `rm -rf ${B}` then `mkdir ${B}`.
+Guarantees a clean build directory every time.
+
+### Summary
+
+| Flag | Meaning | Use case |
+|------|---------|----------|
+| `[dirs]` | `cd` to directory before running | Avoid writing full paths |
+| `[noexec]` | Skip task entirely | No configure step needed |
+| `[nostamp]` | Run task every time | Task must always execute |
+| `[depends]` | Wait for another recipe's task | Cross-recipe dependency |
+| `[cleandirs]` | Delete and recreate directory | Clean build each time |
