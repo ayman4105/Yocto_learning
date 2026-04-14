@@ -1,0 +1,15 @@
+--- git/main.c.orig	2026-04-13 18:53:59.040146836 +0200
++++ git/main.c	2026-04-13 18:55:31.725979328 +0200
+@@ -1,8 +1,9 @@
+ #include<stdio.h>
+ 
+-intmain() {
++int main() {
+     printf("===========================================\n");
+     printf("        Hello Ayman\n");
+     printf("===========================================\n");
+     return 0;
+-}   
+\ No newline at end of file
++}   
++
