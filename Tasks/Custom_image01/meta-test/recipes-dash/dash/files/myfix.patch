@@ -1,0 +1,11 @@
+diff --git a/makefile b/makefile
+index 44ce757..84942c3 100644
+--- a/makefile
++++ b/makefile
+@@ -1,5 +1,5 @@
+ all: dash.c
+-	cc  -Wall -o dash  dash.c
++	${CC} ${CFLAGS} ${LDFLAGS}  -o dash  dash.c
+ 
+ clean:
+ 	dash
