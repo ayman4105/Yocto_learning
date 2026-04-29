@@ -624,3 +624,5 @@ ls /mnt/lib/firmware/brcm/
 ls /mnt/usr/sbin/wpa_supplicant
 
 sudo umount /mnt
+
+```

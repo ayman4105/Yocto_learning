@@ -5,9 +5,6 @@
 - [System Resources Optimization](#system-resources-optimization)
 - [Adding Swap Space](#adding-swap-space)
 - [Build Performance Tuning](#build-performance-tuning)
-- [Fixing vsomeip Compilation Error (GCC 13)](#fixing-vsomeip-compilation-error-gcc-13)
-- [Fixing installed-vs-shipped Error](#fixing-installed-vs-shipped-error)
-- [devtool Quick Reference](#devtool-quick-reference)
 
 ---
 
